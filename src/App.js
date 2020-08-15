@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import apiRequest from './api/productApi';
 import axios from 'axios'
 
 
@@ -10,31 +11,51 @@ function App() {
 
 	const [product, setProduct] = useState([]);
 
-	axios({
-		method: 'GET',
-		url: 'https://5f13a2bc2710570016b37801.mockapi.io/api/products',
-		data: null
-	}).then(res => {
-		setProduct(res.data)
-	}).catch(err => {
-		console.log(err);
-	});
-
-	const onHandleRemove = (id) => {
-		if (confirm('Bạn chắc chắn muốn xóa ?')) { //eslint-disable-line
-			axios({
-				method: 'DELETE',
-				url: 'https://5f13a2bc2710570016b37801.mockapi.io/api/products/' + id,
-				data: null
-			}).catch(err => {
-				console.log(err);
-			});
+	// Danh sách sản phẩm
+	useEffect(() => {
+		const getProducts = async () => {
+			try {
+				const { data } = await apiRequest.getAll();
+				setProduct(data);
+			} catch (error) {
+				console.log('failed to request API: ', error)
+			}
 		}
+		getProducts();
+	}, []);
+
+	const onHandleRemove = async (id) => {
+		try {
+			if (confirm('Bạn chắc chắn muốn xóa ?')) { //eslint-disable-line
+				await apiRequest.remove(id);
+				const { data } = await apiRequest.getAll();
+				setProduct(data);
+			}
+		} catch (error) {
+			console.log('failed to request API: ', error)
+		}
+	}
+
+	// Thêm sản phẩm
+	const onHandleAdd = async (product) => {
+		try {
+			await apiRequest.create(product);
+			const { data } = await apiRequest.getAll();
+			setProduct(data);
+			alert("Thêm sản phẩm thành công")
+		} catch (error) {
+			console.log('failed to request API: ', error)
+		}
+	}
+
+	// Cập nhật product 
+	const onHandleUpdate = async (id, data) => {
+		await apiRequest.update(id, data);
 	}
 
 	return (
 		<div className="App">
-			<Routers products={product} onRemove={onHandleRemove} />
+			<Routers products={product} onRemove={onHandleRemove} onAdd={onHandleAdd} onUpdate={onHandleUpdate} />
 		</div>
 	);
 }

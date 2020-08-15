@@ -3,12 +3,14 @@ import { useForm } from "react-hook-form";
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import firebase from "./../../../firebase"
-import { useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
-const AddProduct = ({ onAdd }) => {
-    const [product, setProduct] = useState([]);
+const EditProduct = ({ products, onUpdate }) => {
+    const { id } = useParams();
+
+    const product = products.find(product => product.id === id);
+
     const { handleSubmit, register, errors } = useForm();
-    let history = useHistory();
 
     const onHandledSubmit = data => {
         console.log(data.image[0]);
@@ -25,12 +27,10 @@ const AddProduct = ({ onAdd }) => {
                     image: url
                 }
                 console.log(newData);
-                onAdd(newData)
-                history.push('/admin/products');
+                onUpdate(id, newData)
             })
         });
     }
-
     return (
         <div className="row">
 
@@ -38,7 +38,7 @@ const AddProduct = ({ onAdd }) => {
                 <form onSubmit={handleSubmit(onHandledSubmit)}>
 
                     <div className="form-group">
-                        <label htmlFor="productPrice">Ảnh sản phẩm</label>
+                        <label htmlFor="productPrice">Ảnh sản phẩmmm</label>
                         <div className="input-group">
                             <div className="custom-file">
                                 <input type="file"
@@ -54,6 +54,7 @@ const AddProduct = ({ onAdd }) => {
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Tên Sản Phẩm</label>
                         <input name="name"
+                            value={product.name}
                             type="text"
                             className="form-control"
                             aria-describedby="nameHelp"
@@ -66,6 +67,7 @@ const AddProduct = ({ onAdd }) => {
                     <div className="form-group">
                         <label htmlFor="exampleInputPassword1">Giá</label>
                         <input name="price" type="number" className="form-control"
+                            value={product.price}
                             ref={register({
                                 required: "Required",
                                 validate: value => value > 0 || "Giá phải lớn hơn 0"
@@ -90,8 +92,8 @@ const AddProduct = ({ onAdd }) => {
     )
 }
 
-AddProduct.propTypes = {
+EditProduct.propTypes = {
 
 }
 
-export default AddProduct
+export default EditProduct

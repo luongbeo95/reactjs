@@ -35,7 +35,7 @@ const ProductsManage = ({ products, onRemove }) => {
                             <td>{product.price}</td>
                             <td>
                                 <button className="btn btn-danger" onClick={() => onDelete(product.id)}>Xóa</button>
-                                <button className="btn btn-warning">Sửa</button>
+                                <Link className="btn btn-warning" to={`/admin/edit/${product.id}`}>Sửa</Link>
                             </td>
                         </tr>
                     )}
